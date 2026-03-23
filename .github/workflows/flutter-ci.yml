@@ -26,8 +26,18 @@ jobs:
         echo "TMBD_API_KEY=${{ secrets.TMBD_API_KEY }}" >> .env
         echo "SUBDL_API_KEY=${{ secrets.SUBDL_API_KEY }}" >> .env
     
+    # Decode and restore the keystore file
+    - name: Decode keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+    # Restore key.properties
+    - name: Create key.properties
+      run: |
+        echo "${{ secrets.KEY_PROPERTIES_FILE }}" > android/key.properties
+    
     - run: flutter pub get
-    - run: flutter format --set-exit-if-changed .
+    - run: dart format --set-exit-if-changed .
     - run: flutter analyze .
     - run: flutter test
     - run: flutter build apk
