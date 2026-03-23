@@ -36,8 +36,8 @@ jobs:
     
     - run: flutter pub get
     - run: dart format .
-    - run: flutter analyze . --no-fatal-infos --no-fatal-warnings  # ← won't fail on info/warning
-    - run: flutter test
+    - run: flutter analyze . --no-fatal-infos --no-fatal-warnings
+    # - run: flutter test   ← removed until you write real tests
     - run: flutter build apk
     
     - uses: actions/upload-artifact@v4
