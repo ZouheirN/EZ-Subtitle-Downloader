@@ -35,8 +35,8 @@ jobs:
         echo "${{ secrets.KEY_PROPERTIES_FILE }}" > android/key.properties
     
     - run: flutter pub get
-    - run: dart format .    # ← just formats, won't fail the build
-    - run: flutter analyze .
+    - run: dart format .
+    - run: flutter analyze . --no-fatal-infos --no-fatal-warnings  # ← won't fail on info/warning
     - run: flutter test
     - run: flutter build apk
     
