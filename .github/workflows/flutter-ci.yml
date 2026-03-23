@@ -17,8 +17,14 @@ jobs:
     
     - uses: subosito/flutter-action@v1
       with:
-        flutter-version: '3.41.2'  # ← pinned version
-        channel: 'stable'          # ← updated to stable to match 3.x releases
+        flutter-version: '3.41.2'
+        channel: 'stable'
+    
+    # Generate .env file from GitHub Secrets
+    - name: Create .env file
+      run: |
+        echo "TMBD_API_KEY=${{ secrets.TMBD_API_KEY }}" >> .env
+        echo "SUBDL_API_KEY=${{ secrets.SUBDL_API_KEY }}" >> .env
     
     - run: flutter pub get
     - run: flutter format --set-exit-if-changed .
