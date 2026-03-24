@@ -25,24 +25,35 @@ jobs:
       run: |
         echo "TMBD_API_KEY=${{ secrets.TMBD_API_KEY }}" >> .env
         echo "SUBDL_API_KEY=${{ secrets.SUBDL_API_KEY }}" >> .env
-    
-    - name: Decode keystore
-      run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
 
-    - name: Create key.properties
-      run: |
-        echo "storePassword=${{ secrets.STORE_PASSWORD }}" > android/key.properties
-        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-        echo "storeFile=../upload-keystore.jks" >> android/key.properties
-    
+    - name: Decode key.properties
+      run: echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" | base64 -d > android/key.properties
+
+    - name: Decode keystore
+      run: echo "${{ secrets.ANDROID_KEY_STORE }}" | base64 -d > android/upload-keystore.jks
+
     - run: flutter pub get
     - run: dart format .
     - run: flutter analyze . --no-fatal-infos --no-fatal-warnings
     - run: flutter build apk
-    
-    - uses: actions/upload-artifact@v4
+
+    - name: Extract Version
+      id: extract_version
+      run: |
+        VERSION=$(grep -oP "^version: \K[^\+]+" pubspec.yaml)
+        echo "version=v$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Create Tag
+      uses: mathieudutour/github-tag-action@v6.1
       with:
-        name: release-apk
-        path: build/app/outputs/apk/release/app-release.apk
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        custom_tag: ${{ steps.extract_version.outputs.version }}
+        tag_prefix: ""
+
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ steps.extract_version.outputs.version }}
+        artifacts: build/app/outputs/apk/release/app-release.apk
+        generateReleaseNotes: true
