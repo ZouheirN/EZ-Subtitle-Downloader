@@ -1,5 +1,5 @@
 *.env
-upload-keystore.jks
+android/upload-keystore.jks
 android/key.properties
 
 # Miscellaneous
