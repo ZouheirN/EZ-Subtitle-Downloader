@@ -68,6 +68,11 @@ jobs:
           sudo apt-get clean || true
           sudo rm -rf /var/lib/apt/lists/*
 
+      - name: Strip release signing config (not needed for debug)
+        run: |
+          sed -i '/signingConfigs {/,/^    }/d' android/app/build.gradle.kts
+          sed -i 's/signingConfig = signingConfigs.getByName("release")/signingConfig = signingConfigs.getByName("debug")/g' android/app/build.gradle.kts
+
       - name: Generate screenshots
         uses: reactivecircus/android-emulator-runner@v2
         with:
